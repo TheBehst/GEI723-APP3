@@ -90,6 +90,13 @@ y_leaky_relu_derivative = leaky_relu_derivative(x, alpha=0.1)
 y_custom_absolute_relu_derivative = custom_absolute_relu_derivative(x)
 
 
+# Cas de paramètres à tester
+params_sigmoid = [0.5, 1.0, 2]
+params_triangular = [(0, 1), (0, 2), (1, 1), (-1, 1)]
+params_gaussian = [(1.0, 0.0), (3, 0.0), (1.0, 1.0), (1.0, -1.0)]
+
+
+
 # Création des graphiques
 plt.figure(figsize=(5, 3))
 
@@ -177,6 +184,47 @@ plt.ylabel("$S_j(t)$")
 plt.grid()
 plt.legend()
 
+
+plt.tight_layout()
+
+
+# Création des graphiques
+fig, axes = plt.subplots(3, 2, figsize=(14, 12))
+
+# Sigmoid Approximation and Derivative
+for alpha in params_sigmoid:
+    y_sigmoid = sigmoid_approximation(x, alpha)
+    y_sigmoid_derivative = sigmoid_derivative(x, alpha)
+    axes[0, 0].plot(x, y_sigmoid, label=f"Sigmoid alpha={alpha}")
+    axes[0, 1].plot(x, y_sigmoid_derivative, label=f"Sigmoid Derivative alpha={alpha}")
+
+# Triangular Approximation and Derivative
+for theta, delta in params_triangular:
+    y_triangular = triangular_approximation(x, theta, delta)
+    y_triangular_derivative = triangular_derivative(x, theta, delta)
+    axes[1, 0].plot(x, y_triangular, label=f"Triangular theta={theta}, delta={delta}")
+    axes[1, 1].plot(x, y_triangular_derivative, label=f"Triangular Derivative theta={theta}, delta={delta}")
+
+# Gaussian Approximation and Derivative
+for alpha, theta in params_gaussian:
+    y_gaussian = gaussian_approximation(x, alpha, theta)
+    y_gaussian_derivative = gaussian_derivative(x, alpha, theta)
+    axes[2, 0].plot(x, y_gaussian, label=f"Gaussian alpha={alpha}, theta={theta}")
+    axes[2, 1].plot(x, y_gaussian_derivative, label=f"Gaussian Derivative alpha={alpha}, theta={theta}")
+
+# Personnalisation des graphiques
+for i in range(3):
+    axes[i, 0].set_title(f"Activation Function (Case {i+1})")
+    axes[i, 0].set_xlabel("x")
+    axes[i, 0].set_ylabel("f(x)")
+    axes[i, 0].grid(True)
+    axes[i, 0].legend(fontsize=7)
+
+    axes[i, 1].set_title(f"Derivative (Case {i+1})")
+    axes[i, 1].set_xlabel("x")
+    axes[i, 1].set_ylabel("f'(x)")
+    axes[i, 1].grid(True)
+    axes[i, 1].legend(fontsize=7)
 
 plt.tight_layout()
 plt.show()
