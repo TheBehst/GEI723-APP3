@@ -64,7 +64,7 @@ x = np.linspace(-5, 5, 500)
 
 # Calcul des valeurs des fonctions
 y_relu = relu(x)
-y_leaky_relu = leaky_relu(x, alpha=0.01)
+y_leaky_relu = leaky_relu(x, alpha=0.1)
 y_custom_absolute_relu = custom_absolute_relu(x)
 y_sigmoid = sigmoid_approximation(x, alpha=2.0)
 y_linear = linear_approximation(x, epsilon=1.0)
@@ -86,7 +86,7 @@ y_linear_derivative = linear_derivative(x, epsilon=1.0)
 y_triangular_derivative = triangular_derivative(x, theta=0.0, delta=1.0)
 y_gaussian_derivative = gaussian_derivative(x, alpha=1.0, theta=0.0)
 y_relu_derivative = relu_derivative(x)
-y_leaky_relu_derivative = leaky_relu_derivative(x, alpha=0.01)
+y_leaky_relu_derivative = leaky_relu_derivative(x, alpha=0.1)
 y_custom_absolute_relu_derivative = custom_absolute_relu_derivative(x)
 
 
