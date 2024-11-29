@@ -1,37 +1,58 @@
-# GEI723-APP3
+# **GEI723-APP3**  
+## **Réseau de Neurones à Impulsions - Modèle LIF en PyTorch**  
 
-# Réseau de Neurones à Impulsions - Modèle LIF en PyTorch
+### **Objectif**  
+Ce projet implémente un réseau de neurones à impulsions (SNN) basé sur le modèle **Leaky Integrate-and-Fire (LIF)** en PyTorch.  
+L'objectif est d'appliquer la rétropropagation des erreurs dans un réseau SNN afin d'effectuer une classification sur MNIST (banque d'images de chiffres manuscrits).  
+Ce modèle permet d'analyser les performances des réseaux de neurones à impulsions dans des tâches de classification, en traitant des trains d'impulsions comme entrées.  
 
-## Objectif
-Ce projet implémente un réseau de neurones à impulsions (SNN) en utilisant un modèle **Leaky Integrate-and-Fire (LIF)**, en PyTorch. 
-L'objectif est d'implémenter la méthode de rétropropagation de l'erreur dans un réseau SNN afin de réaliser de la classification sur MINST (banque de données d'image de chiffres manuscrits). 
-Ce modèle est conçu pour étudier les performances des réseaux de neurones à impulsions dans des tâches de classification en utilisant des trains d'impulsions comme entrée.
+---
 
-## Structure du Code
+### **Structure du Code**  
 
-Le code est structuré en quatre sections principales :
+Le code est organisé en **quatre sections principales**.  
 
-1. **Préparation de la configuration pour le réseau de neurones**  
-   Cette section définit la configuration du réseau, y compris l'initialisation des poids, des paramètres temporels (tau de la membrane et des courants), et la préparation du train d'impulsions d'entrée.
+#### **1. Préparation de la Configuration pour le Réseau de Neurones**  
+Cette section définit et initialise les éléments nécessaires pour construire et configurer le réseau.  
+- **Sous-sections :**  
+  - Configuration 
+  - Préparation des données 
+  - Conversion en décharges 
+  - Division Entraînement/Test/Validation 
+  - Création du réseau 
+  - Différentes fonctions d'activation 
+  - Choix de l'utilisateur 
+  - Implémentation dynamique LIF 
 
-2. **Entrainement et Validation**  
-   Cette étape consiste à entraîner le modèle en ajustant les poids du réseau sur un ensemble de données d'apprentissage. Les performances sont validées sur un jeu de données de validation pour évaluer la capacité du réseau à généraliser.
+#### **2. Entraînement et Validation**  
+Dans cette section, le modèle est entraîné sur l'ensemble d'apprentissage :  
+- **Entraînement :** Ajustement des poids en minimisant la perte.  
+- **Validation :** Évaluation des performances sur un ensemble de validation pour contrôler la généralisation.  
 
-3. **Test**  
-   Le modèle entraîné est testé sur des données inconnues (jeu de test) pour mesurer sa précision et sa robustesse dans des conditions réelles d'utilisation.
+#### **3. Test**  
+Le modèle final est testé sur des données inconnues (jeu de test). 
 
-4. **Graphiques**  
-   Des graphiques sont générés pour visualiser l'évolution du potentiel membranaire des neurones, les courants d'entrée, ainsi que les impulsions générées au fil du temps. Cela permet de suivre l'activité neuronale et d'analyser les dynamiques du modèle.
+#### **4. Visualisation et Graphiques**  
+Cette section permet d'analyser les résultats et les dynamiques du réseau grâce à des graphiques.  
+- **Sous-sections :**  
+  - Évolution des poids  
+  - Évolution de la perte 
 
-## Études Menées
+---
 
-Ce modèle a été conçu pour explorer les dynamiques des neurones à impulsions avec une approche à base de courant. Les principales études comprennent :
+### **Études Menées** 
 
-- L'impact des poids sur la propagation des signaux et le déclenchement des impulsions.
-- L'efficacité du modèle LIF dans le traitement des entrées en forme de trains d'impulsions.
-- L'analyse du comportement du potentiel membranaire dans le temps et la gestion des seuils de déclenchement.
-  
-Le code peut être utilisé comme base pour explorer d'autres dynamiques neuronales ou pour tester des variantes du modèle LIF dans des réseaux à impulsions plus complexes.
+Ce Notebook propose l'implémentation et l'analyse de plusieurs fonctions d'activation pour les réseaux de neurones à impulsions :  
+- **ReLU Classique**  
+- **Leaky ReLU**  
+- **ReLU basée sur une fonction absolue (Abs ReLU)**  
+- **Approximation sigmoïdale**  
+- **Approximation triangulaire**  
+- **Approximation gaussienne**  
+
+Ce Notebook permet de tester les performances de classification en fonction des différents paramètres des fonctions listé ci-dessus.
+
+Ce Notebook permet aussi de tester des configurations d'apprentissage extrêmes
 
 
 ## Auteurs :
