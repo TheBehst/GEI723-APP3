@@ -91,8 +91,8 @@ y_custom_absolute_relu_derivative = custom_absolute_relu_derivative(x)
 
 
 # Cas de paramètres à tester
-params_sigmoid = [0.5, 1.0, 2]
-params_triangular = [(0, 1), (0, 2), (1, 1), (-1, 1)]
+params_sigmoid = [0.5, 1.0, 2]# aplha
+params_triangular = [(0, 1), (0, 2), (1, 1), (-1, 1)]#thetha, delta
 params_gaussian = [(1.0, 0.0), (3, 0.0), (1.0, 1.0), (1.0, -1.0)]
 
 
