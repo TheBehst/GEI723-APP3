@@ -36,13 +36,13 @@ class SpikeFunction_Abs_RELU(Function):
     @staticmethod
     def forward(ctx, input):
         ctx.save_for_backward(input)
-        return torch.abs(input)# Retourne la valeur absolue de l'entrée.
+        return torch.abs(input) # Retourne la valeur absolue de l'entrée.
 
     @staticmethod
     def backward(ctx, grad_output):
         input, = ctx.saved_tensors
-        grad_input = grad_output.clone()# Copie le gradient de sortie.
-        grad_input[input < 0] *= -1# Multiplie par -1 pour les entrées négatives.
+        grad_input = grad_output.clone() # Copie le gradient de sortie.
+        grad_input[input < 0] *= -1 # Multiplie par -1 pour les entrées négatives.
         return grad_input
 
 
@@ -58,7 +58,7 @@ class SpikeFunction_Sigmoid(Function):
     def backward(ctx, grad_output):
         sigmoid, alpha = ctx.saved_tensors # Récupère la sortie sauvegardée (sigmoïde).
         grad_input = grad_output * sigmoid * (1 - sigmoid)* alpha # Applique la dérivée de la sigmoïde.
-        return grad_input
+        return grad_input, None
 
 
 class SpikeFunction_Triangular(Function):
@@ -73,7 +73,23 @@ class SpikeFunction_Triangular(Function):
         # 2. abs(input - theta) : Calcul de la valeur absolue de l'entrée par rapport au paramètre theta
         # 3. 1 - abs(input - theta) / delta : Applique une forme triangulaire centrée autour de theta avec une largeur de delta
         # 4. torch.maximum : Si la valeur est négative, on remplace par 0
-        grad_input = torch.maximum(1 - torch.abs(input - theta) / delta, torch.tensor(0.0, device=input.device))
+        # grad_input = torch.maximum(1 - torch.abs(input - theta) / delta,
+        #                             torch.tensor(0.0, device=input.device))
+
+        grad_input = torch.where(
+            input < 0.5,
+            0,  # Output 0 for x < 0.5
+            torch.where(
+                input <= 1,
+                2 * (input - 0.5), 
+                torch.where(
+                    input <= 1.5,
+                    2 * (1.5 - input),
+                    0  
+                    )
+            )
+        )
+        
         return grad_input
 
 
