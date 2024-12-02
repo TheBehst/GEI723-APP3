@@ -163,6 +163,20 @@ class SpikeFunction_Voigt(Function):
         #TODO THIS DERIVATIVE IS SO ASS
         grad_input = grad_output * sigmoid * (1 - sigmoid)* alpha # Applique la dérivée de la sigmoïde.
         return grad_input, None
+class SpikeFunction_Triangular2(Function):
+    @staticmethod
+    def forward(ctx, input, theta=0, delta=1):
+        ctx.save_for_backward(input)# Sauvegarde l'entrée pour la passe arrière.
+        ctx.theta = theta
+        ctx.delta = delta
+        
+        # Calcul de la fonction triangulaire en utilisant les paramètres theta et delta
+        # 1. input - theta : Décalage de l'entrée par rapport au paramètre theta
+        # 2. abs(input - theta) : Calcul de la valeur absolue de l'entrée par rapport au paramètre theta
+        # 3. 1 - abs(input - theta) / delta : Applique une forme triangulaire centrée autour de theta avec une largeur de delta
+        # 4. torch.maximum : Si la valeur est négative, on remplace par 0
+        grad_input = torch.maximum(1 - torch.abs(input - theta) / delta, torch.tensor(0.0, device=input.device))
+        return grad_input
 
 
 class SpikeFunctionEnum(Enum):
