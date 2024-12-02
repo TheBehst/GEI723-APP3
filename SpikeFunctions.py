@@ -185,3 +185,17 @@ spike_func_dict = {
     SpikeFunctionEnum.guassian:           (SpikeFunction_Gaussian,        {"alpha": 1.0, "theta": 0.0})
 }
 
+class CustomActivation(torch.nn.Module):
+    def __init__(self, activation_func: SpikeFunctionEnum):
+        super(CustomActivation, self).__init__()
+        if activation_func not in SpikeFunctionEnum:
+            raise ValueError(f"Unsupported activation_func: {activation_func}")
+        
+        self.params = None
+        self.activation_class, self.params = spike_func_dict[activation_func]
+
+    def forward(self, x):
+        if not self.params:
+            return self.activation_class.apply(x)
+        return self.activation_class.apply(x, **self.params)
+
