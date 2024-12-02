@@ -1,5 +1,6 @@
 import torch
 from torch.autograd import Function
+from scipy.special import *
 
 '''dans les fonctions backward on doit multiplier grad_input (le gradient des couches apres) 
 par le gradient de la couche actuelle => derivation en chaine'''
@@ -63,18 +64,8 @@ class SpikeFunction_Sigmoid(Function):
 
 class SpikeFunction_Triangular(Function):
     @staticmethod
-    def forward(ctx, input, theta=0, delta=1):
+    def forward(ctx, input):
         ctx.save_for_backward(input) # Sauvegarde l'entrée pour la passe arrière.
-        ctx.theta = theta
-        ctx.delta = delta
-        
-        # Calcul de la fonction triangulaire en utilisant les paramètres theta et delta
-        # 1. input - theta : Décalage de l'entrée par rapport au paramètre theta
-        # 2. abs(input - theta) : Calcul de la valeur absolue de l'entrée par rapport au paramètre theta
-        # 3. 1 - abs(input - theta) / delta : Applique une forme triangulaire centrée autour de theta avec une largeur de delta
-        # 4. torch.maximum : Si la valeur est négative, on remplace par 0
-        # grad_input = torch.maximum(1 - torch.abs(input - theta) / delta,
-        #                             torch.tensor(0.0, device=input.device))
 
         grad_input = torch.where(
             input < 0.5,
@@ -83,7 +74,7 @@ class SpikeFunction_Triangular(Function):
                 input <= 1,
                 2 * (input - 0.5), 
                 torch.where(
-                    input <= 1.5,
+                    input < 1.5,
                     2 * (1.5 - input),
                     0  
                     )
@@ -91,16 +82,15 @@ class SpikeFunction_Triangular(Function):
         )
         
         return grad_input
-
-
     
     @staticmethod
     def backward(ctx, grad_output):
-        input, = ctx.saved_tensors  # Récupère l'entrée sauvegardée
-        grad_input = grad_output.clone()  # Copie le gradient de sortie
-        grad_input[torch.abs(input - ctx.theta) >= ctx.delta] = 0  # Pas de gradient si |input - theta| >= delta
-        grad_input[torch.abs(input - ctx.theta) < ctx.delta] = -1 / ctx.delta  # Gradient linéaire
-        return grad_input , None, None
+        input, = ctx.saved_tensors  
+        grad_input = grad_output.clone()  
+
+        grad_input[(input>=1) & (input<=1.5)] *= -1 
+        grad_input[(input<0.5) | (input>1.5)] = 0
+        return grad_input
 
 
 class SpikeFunction_Gaussian(Function):
@@ -128,3 +118,17 @@ class SpikeFunction_Gaussian(Function):
         grad_input = grad_output * (-2 * alpha * (input - theta)) * gaussian
 
         return grad_input,None,None
+    
+class SpikeFunction_Voigt(Function):
+    @staticmethod
+    def forward(ctx, input, sigma=1.0, gamma = 1.0):
+        voigt = voigt_profile(input, sigma, gamma)
+        sigmoid = torch.sigmoid(alpha*input) 
+        ctx.save_for_backward(sigmoid, torch.tensor(alpha)) # Sauvegarde la sortie pour la passe arrière.
+        return sigmoid
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        sigmoid, alpha = ctx.saved_tensors # Récupère la sortie sauvegardée (sigmoïde).
+        grad_input = grad_output * sigmoid * (1 - sigmoid)* alpha # Applique la dérivée de la sigmoïde.
+        return grad_input, None
