@@ -122,13 +122,14 @@ class SpikeFunction_Gaussian(Function):
 class SpikeFunction_Voigt(Function):
     @staticmethod
     def forward(ctx, input, sigma=1.0, gamma = 1.0):
-        voigt = voigt_profile(input, sigma, gamma)
-        sigmoid = torch.sigmoid(alpha*input) 
-        ctx.save_for_backward(sigmoid, torch.tensor(alpha)) # Sauvegarde la sortie pour la passe arrière.
-        return sigmoid
+        voigt = voigt_profile(input.detach().numpy(), sigma, gamma)
+        voigt = torch.tensor(voigt, dtype=input.dtype, device=input.device)  
+        ctx.save_for_backward(input, torch.tensor(sigma), torch.tensor(gamma))
+        return voigt
 
     @staticmethod
     def backward(ctx, grad_output):
-        sigmoid, alpha = ctx.saved_tensors # Récupère la sortie sauvegardée (sigmoïde).
+        input, sigma, gamma = ctx.saved_tensors
+        #TODO THIS DERIVATIVE IS SO ASS
         grad_input = grad_output * sigmoid * (1 - sigmoid)* alpha # Applique la dérivée de la sigmoïde.
         return grad_input, None
