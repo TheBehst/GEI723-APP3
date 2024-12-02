@@ -1,9 +1,39 @@
+from enum import Enum
 import torch
 from torch.autograd import Function
 from scipy.special import *
 
 '''dans les fonctions backward on doit multiplier grad_input (le gradient des couches apres) 
 par le gradient de la couche actuelle => derivation en chaine'''
+
+"""
+Cette class permet de calculer la sortie d'une fonction lors de la propagation avant et de personaliser la derivée lors de la retropropagation de l'erreur.
+Voir cet exemple pour plus de détails : https://pytorch.org/tutorials/beginner/examples_autograd/two_layer_net_custom_function.html
+"""
+class SpikeFunction_Default(torch.autograd.Function):
+    """
+    Dans la passe avant, nous recevons un tenseur contenant l'entrée (potential-threshold).
+    Nous appliquons la fonction Heaviside et renvoyons un tenseur contenant la sortie.
+    """
+    @staticmethod
+    def forward(ctx, input):
+        ctx.save_for_backward(input)
+        out = torch.zeros_like(input)
+        out[input > 0] = 1.0 # On génère une décharge quand (potential-threshold) > 0
+        return out
+
+    """
+    Dans la passe arrière, nous recevons un tenseur contenant le gradient de l'erreur par rapport à la sortie.
+    Nous calculons le gradient de l'erreur par rapport à l'entrée en utilisant la dérivée de la fonction ReLu.
+    """
+    @staticmethod
+    def backward(ctx, grad_output):
+        input, = ctx.saved_tensors
+        grad_relu = torch.ones_like(input) 
+        grad_relu[input < 0] = 0          # La dérivée de la fonction ReLU
+        return grad_output.clone()*grad_relu
+    
+    
 class SpikeFunction_Classical_RELU(Function):
     @staticmethod
     def forward(ctx, input):
@@ -133,3 +163,25 @@ class SpikeFunction_Voigt(Function):
         #TODO THIS DERIVATIVE IS SO ASS
         grad_input = grad_output * sigmoid * (1 - sigmoid)* alpha # Applique la dérivée de la sigmoïde.
         return grad_input, None
+
+
+class SpikeFunctionEnum(Enum):
+    classical_relu = 1
+    leaky_relu = 2
+    abs_relu = 3
+    heaviside = 4
+    sigmoid = 5
+    triangular = 6
+    guassian = 7
+    
+
+spike_func_dict = {
+    SpikeFunctionEnum.classical_relu:     (SpikeFunction_Classical_RELU,  None), 
+    SpikeFunctionEnum.leaky_relu:         (SpikeFunction_Leaky_RELU,      None),
+    SpikeFunctionEnum.abs_relu:           (SpikeFunction_Abs_RELU,        None),
+    SpikeFunctionEnum.heaviside:            (SpikeFunction_Default,         None),
+    SpikeFunctionEnum.triangular:         (SpikeFunction_Triangular,      None),
+    SpikeFunctionEnum.sigmoid:            (SpikeFunction_Sigmoid,         {"alpha": 2.0}),
+    SpikeFunctionEnum.guassian:           (SpikeFunction_Gaussian,        {"alpha": 1.0, "theta": 0.0})
+}
+
